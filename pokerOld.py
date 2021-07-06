@@ -72,6 +72,7 @@ def combination():
                             newCombo = sorted(tempNumDic,key=innerRepeats)
                             newCombo.append(newCombo[3])
                             singlePair.append(newCombo)
+                            print(tempNumDic)
                         #double pair
                         elif temp == [1, 2, 2]:
                             newCombo = sorted(tempNumDic,key=innerRepeats)
@@ -140,7 +141,7 @@ def combination():
         #print(round((len(sets)/totalHands)*100,4))
 
 # combination()
-print(suits())
+print(combination())
 
 
 

@@ -38,6 +38,10 @@ def suits():
     for i in suits:
         for j in range(1,14):
             deck.append(i+str(j))
-    return deck
+    return np.array(deck)
 '''
-print(timeit.timeit(oldCode,statement,number=10000000))
+# print(timeit.timeit(newCode,statement,number=10000000))
+
+arr = arr2 = np.ndarray(0,dtype=object)
+print(np.append('1',arr))
+print(arr2)
