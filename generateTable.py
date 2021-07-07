@@ -11,7 +11,7 @@
 """
 # Project started on 29/6/2021
 
-# The purpose of this Python file is to produce an excel table containing the
+# The purpose of this Python file is to produce a numpy array containing the
 # relative strength for each starting hand. This way when given the two starting
 # hands, there is no need to recalculate the strengths. This will reduce
 # computation time massively.
