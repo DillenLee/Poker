@@ -196,7 +196,7 @@ def combination():
                 writer.writerow([str(val.number)+val.suit for val in hand])
 
 # Call the function
-combination()
+# combination()
 # Time the code.
 tf = time.time()
-print(tf-t0)
+# print(tf-t0)
