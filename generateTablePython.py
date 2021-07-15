@@ -54,7 +54,8 @@ def outerHighCardSort(i):
 #-----------------------------
 
 
-def combination():
+def combination(deck):
+    # deck is of numpy array type
     # Define the lists which contain a 'Class' of poker hands
     singlePair = []
     doublePair = []
@@ -65,8 +66,6 @@ def combination():
     straight = []
     straightFlush = []
     highCard = []
-
-    deck = generateDeck() # deck is of numpy array type
 
     # Loop through every combination of cards in the deck
     for i in range(0,48):
@@ -183,8 +182,17 @@ def combination():
     #Hierarchy
     # This simply groups all the types of hands together for simplicity in the next part
     hierarchy = [straightFlush, quadruple, fullHouse, flush, straight, triple, doublePair, singlePair, highCard]
+    allHands = np.ndarray(0)
+    for group in hierarchy:
+        allHands = np.append(allHands,[group])
 
-    # Print just to make sure I filter the correct cards which I do!
+    print(len(allHands))
+    return allHands
+
+    # Edit 13/7/2021 Removed the save to csv function as it turns out to not be useful and instead this entire file will be loaded into the next part
+    # Instead the flattened folder is returned
+
+    '''# Print just to make sure I filter the correct cards which I do!
     for group in hierarchy:
         print(len(group))
     # Finally save the cards in a csv file
@@ -194,9 +202,9 @@ def combination():
         for val in hierarchy:
             for hand in val:
                 writer.writerow([str(val.number)+val.suit for val in hand])
-
+    '''
 # Call the function
 # combination()
 # Time the code.
-tf = time.time()
+# tf = time.time()
 # print(tf-t0)
