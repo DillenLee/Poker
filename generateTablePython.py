@@ -17,7 +17,7 @@
 import time
 import csv
 import numpy as np
-import operator as op
+from itertools import chain
 #------------------------------
 # Set the starting time
 t0 = time.time()
@@ -41,10 +41,16 @@ def generateDeck():
         deck[i] = card(suit,number)
     return deck
 
+# Generate the value of aces with number 1 for straights
+def generateOneAce():
+    oneC = card('C',1)
+    oneS = card('S',1)
+    oneH = card('H',1)
+    oneD = card('D',1)
+    return [oneC,oneS,oneH,oneD]
+
 # Sorting algorithms for later
 #-----------------------------
-def innerHighCardSort(i):
-    return i.number
 
 def outerHighCardSort(i):
     temp = []
@@ -54,7 +60,7 @@ def outerHighCardSort(i):
 #-----------------------------
 
 
-def combination(deck):
+def combination(deck,oneAces):
     # deck is of numpy array type
     # Define the lists which contain a 'Class' of poker hands
     singlePair = []
@@ -136,6 +142,7 @@ def combination(deck):
 
                             # sort numberOnly
                             numberOnly.sort()
+                            hand.sort(key = lambda card: card.number)
                             # If the length of the set is only 1 then we know all cards have same suit and thus a sort of flush
                             if len(suitSet) == 1:
                                 # This simply filters through hands which follow a sequence and therefore a straight.
@@ -144,12 +151,20 @@ def combination(deck):
                                 # Straights can also be built with aces acting as 1 so here we make sure we don't forget about them!
                                 elif numberOnly == [2, 3, 4, 5, 14]:
                                     # Add a card with the same suit as the ace but with a number = 1
-                                    hand.insert(0,card(hand[-1].suit,1))
+                                    replaceSuit = hand[-1].suit
+                                    if replaceSuit == 'C':
+                                        newCard = oneAces[0]
+                                    elif replaceSuit == 'S':
+                                        newCard = oneAces[1]
+                                    elif replaceSuit == 'H':
+                                        newCard = oneAces[2]
+                                    elif replaceSuit == 'D':
+                                        newCard = oneAces[3]
+                                    hand.insert(0,newCard)
                                     # Remove the last wrong ace card in the hand
                                     hand = hand[:-1]
                                     straightFlush.append(hand)
                                 else:
-                                    hand.sort(key=innerHighCardSort)
                                     flush.append(hand)
                             # Just the same as with the flushes... but instead called straights and highcards
                             else:
@@ -157,11 +172,19 @@ def combination(deck):
                                     straight.append(hand)
                                 elif numberOnly == [2, 3, 4, 5, 14]:
                                     # Same process as for straight flush
-                                    hand.insert(0,card(hand[-1].suit,1))
+                                    replaceSuit = hand[-1].suit
+                                    if replaceSuit == 'C':
+                                        newCard = oneAces[0]
+                                    elif replaceSuit == 'S':
+                                        newCard = oneAces[1]
+                                    elif replaceSuit == 'H':
+                                        newCard = oneAces[2]
+                                    elif replaceSuit == 'D':
+                                        newCard = oneAces[3]
+                                    hand.insert(0,newCard)
                                     hand = hand[:-1]
                                     straight.append(hand)
                                 else:
-                                    hand.sort(key=innerHighCardSort)
                                     highCard.append(hand)
 
 
@@ -182,11 +205,9 @@ def combination(deck):
     #Hierarchy
     # This simply groups all the types of hands together for simplicity in the next part
     hierarchy = [straightFlush, quadruple, fullHouse, flush, straight, triple, doublePair, singlePair, highCard]
-    allHands = np.ndarray(0)
-    for group in hierarchy:
-        allHands = np.append(allHands,[group])
+    allHands = list(chain.from_iterable(hierarchy))
 
-    print(len(allHands))
+
     return allHands
 
     # Edit 13/7/2021 Removed the save to csv function as it turns out to not be useful and instead this entire file will be loaded into the next part
