@@ -69,6 +69,7 @@ def calculateWLProb(hole):
 
     if 'altCardA' in locals():
         if 'altCardB' in locals():
+            print('double')
             # Both cards are aces
             condition = '(hole[0] in hand and hole[1] in hand) or (altCardA in hand and altCardB in hand) or (altCardA in hand and hole[1] in hand) or (hole[0] in hand and altCardB in hand)'
         else:
@@ -86,10 +87,10 @@ def calculateWLProb(hole):
 
 
     for index,hand in enumerate(allHands):
+        # print(100*index/len(allHands))
         if eval(condition):
             # Find the index of the specific hand
             freqOfHand += 1
-            print(100*index/len(allHands))
             # Now look for all the same value hand by checking adjacent numbers
             upperLimit = lowerLimit = index
             mainCard = allNumbers[index]
@@ -108,6 +109,7 @@ def calculateWLProb(hole):
             totalWin += freqToProb(winFreq)
             totalLoss += freqToProb(lossFreq)
     # take the simple average as all cards/hands are equally likely
+    print(index)
     totalTie = totalTie/freqOfHand
     totalWin = totalWin/freqOfHand
     totalLoss = totalLoss/freqOfHand
@@ -115,15 +117,18 @@ def calculateWLProb(hole):
 
 
 
-hole = [deck[12],deck[13]]
-print([str(card.number)+card.suit for card in hole])
-tie ,win ,loss = calculateWLProb(hole)
-print(tie,win,loss)
 # Loop through all the possible combinations of the starting hands
-'''
-for i in range(0,51):
-    for j in range(i+1,52):
-'''
+with open('startingHands.csv','w') as file:
+    writer = csv.writer(file)
+    for i in range(0,51):
+        for j in range(i+1,52):
+            hole = [deck[i],deck[j]]
+            tie ,win ,loss = calculateWLProb(hole)
+            row = [str(card.number)+card.suit for card in hole]+[tie,win,loss]
+            # print([str(card.number)+card.suit for card in hole])
+            # print(tie,win,loss)
+            print(row)
+            writer.writerow(row)
 
 tf = time.time()
 print(tf-t0)
