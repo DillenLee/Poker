@@ -69,7 +69,6 @@ def calculateWLProb(hole):
 
     if 'altCardA' in locals():
         if 'altCardB' in locals():
-            print('double')
             # Both cards are aces
             condition = '(hole[0] in hand and hole[1] in hand) or (altCardA in hand and altCardB in hand) or (altCardA in hand and hole[1] in hand) or (hole[0] in hand and altCardB in hand)'
         else:
@@ -109,7 +108,6 @@ def calculateWLProb(hole):
             totalWin += freqToProb(winFreq)
             totalLoss += freqToProb(lossFreq)
     # take the simple average as all cards/hands are equally likely
-    print(index)
     totalTie = totalTie/freqOfHand
     totalWin = totalWin/freqOfHand
     totalLoss = totalLoss/freqOfHand
@@ -125,8 +123,6 @@ with open('startingHands.csv','w') as file:
             hole = [deck[i],deck[j]]
             tie ,win ,loss = calculateWLProb(hole)
             row = [str(card.number)+card.suit for card in hole]+[tie,win,loss]
-            # print([str(card.number)+card.suit for card in hole])
-            # print(tie,win,loss)
             print(row)
             writer.writerow(row)
 
