@@ -27,6 +27,7 @@ class card:
     def __init__(self, suit, number):
         self.suit = suit
         self.number = number
+        self.comb = str(number)+suit
 
 # This function produces an array containing all the cards in the deck
 def generateDeck():
@@ -51,7 +52,8 @@ def generateOneAce():
 
 # Sorting algorithms for later
 #-----------------------------
-
+# Is this relevant?
+# Figure out later
 def outerHighCardSort(i):
     temp = []
     for value in i:
@@ -74,6 +76,7 @@ def combination(deck,oneAces):
     highCard = []
 
     # Loop through every combination of cards in the deck
+    # 5/8/2021 maybe should use itertools.combinations instead of this madness
     for i in range(0,48):
         for j in range(i+1,49):
             for k in range(j+1,50):
