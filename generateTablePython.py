@@ -17,6 +17,7 @@
 import time
 import csv
 import numpy as np
+import itertools as it
 from itertools import chain
 #------------------------------
 # Set the starting time
@@ -62,8 +63,10 @@ def outerHighCardSort(i):
 #-----------------------------
 
 
-def combination(deck,oneAces):
-    # deck is of numpy array type
+def sortAllHands(unsortedHandsList,oneAces):
+
+    # loops through the unsorted list of hands and orders them strongest to weakest between all the hands, and weakest to strongest within the cards. I don't know why I did it like this in the beginning but it's too much effor to change right now.
+
     # Define the lists which contain a 'Class' of poker hands
     singlePair = []
     doublePair = []
@@ -75,120 +78,113 @@ def combination(deck,oneAces):
     straightFlush = []
     highCard = []
 
-    # Loop through every combination of cards in the deck
-    # 5/8/2021 maybe should use itertools.combinations instead of this madness
-    for i in range(0,48):
-        for j in range(i+1,49):
-            for k in range(j+1,50):
-                for l in range(k+1,51):
-                    for m in range(l+1,52):
-                        # Create a hand containing 5 cards
-                        hand = [deck[i],deck[j],deck[k],deck[l],deck[m]]
-                        # Remeber that a card has a number attribute so create a deck with only the numbers
-                        numberOnly = [card.number for card in hand]
 
-                        #numFreqDic produces a dictionary which tracks frequency of number
-                        numFreqDic = {}
-                        for value in hand:
-                            num = value.number
-                            numFreqDic[num] = numFreqDic.get(num, 0) + 1
-                        #numbFreq produces a list of the frequency of numbers without the associated dictionary like in numFreqDic
-                        numbFreq = []
-                        for key in numFreqDic:
-                            numbFreq.append(numFreqDic[key])
-                            numbFreq.sort()
-                        #Sort smallest => highest
+    for hand in unsortedHandsList:
 
-                        #sort defintions
-                        def innerRepeats(i):
-                            # Sort first by the frequency then by the card number
-                            return numFreqDic[i],i
+        numberOnly = [card.number for card in hand]
 
-                        # Returns a hand containing 'card' class ordered by the frequency then card number
-                        def sortedHand():
-                            sortHand = []
-                            # This creates an array of card numbers, ordered.
-                            newCombo = sorted(numFreqDic,key=innerRepeats)
-                            # For every number find the index of this card in number only and add that card to the sorted hand
-                            for number in newCombo:
-                                for index in np.where(np.array(numberOnly) == number)[0]:
-                                    sortHand.append(hand[index])
-                            return sortHand
+        #numFreqDic produces a dictionary which tracks frequency of number
+        numFreqDic = {}
+        for value in hand:
+            num = value.number
+            numFreqDic[num] = numFreqDic.get(num, 0) + 1
+        #numbFreq produces a list of the frequency of numbers without the associated dictionary like in numFreqDic
+        numbFreq = []
+        for key in numFreqDic:
+            numbFreq.append(numFreqDic[key])
+            numbFreq.sort()
+        #Sort smallest => highest
 
-                        #single pair
-                        # These numbFreq are unique to a specific hand
-                        if numbFreq == [1, 1, 1, 2]:
-                            sortHand = sortedHand()
-                            singlePair.append(sortHand)
-                        #double pair
-                        elif numbFreq == [1, 2, 2]:
-                            sortHand = sortedHand()
-                            doublePair.append(sortHand)
+        #sort defintions
+        def innerRepeats(i):
+            # Sort first by the frequency then by the card number
+            return numFreqDic[i],i
 
-                        #three of a kind
-                        elif numbFreq == [1, 1, 3]:
-                            sortHand = sortedHand()
-                            triple.append(sortHand)
-                        #four of a kind
-                        elif numbFreq == [1, 4]:
-                            sortHand = sortedHand()
-                            quadruple.append(sortHand)
-                        #full house
-                        elif numbFreq == [2, 3]:
-                            sortHand = sortedHand()
-                            fullHouse.append(sortHand)
-                        #straight, flush, straight flush, and high card remaining
-                        else:
-                            # Define a set type containg only the suits
-                            # As it is a set no repeats are counted
-                            suitSet = set([card.suit for card in hand])
+        # Returns a hand containing 'card' class ordered by the frequency then card number
+        def sortedHand():
+            sortHand = []
+            # This creates an array of card numbers, ordered.
+            newCombo = sorted(numFreqDic,key=innerRepeats)
+            # For every number find the index of this card in number only and add that card to the sorted hand
+            for number in newCombo:
+                for index in np.where(np.array(numberOnly) == number)[0]:
+                    sortHand.append(hand[index])
+            return sortHand
 
-                            # sort numberOnly
-                            numberOnly.sort()
-                            hand.sort(key = lambda card: card.number)
-                            # If the length of the set is only 1 then we know all cards have same suit and thus a sort of flush
-                            if len(suitSet) == 1:
-                                # This simply filters through hands which follow a sequence and therefore a straight.
-                                if numberOnly[1] == numberOnly[0] + 1 and numberOnly[2] == numberOnly[0] + 2 and numberOnly[3] == numberOnly[0] + 3 and numberOnly[4] == numberOnly[0] + 4:
-                                    straightFlush.append(hand)
-                                # Straights can also be built with aces acting as 1 so here we make sure we don't forget about them!
-                                elif numberOnly == [2, 3, 4, 5, 14]:
-                                    # Add a card with the same suit as the ace but with a number = 1
-                                    replaceSuit = hand[-1].suit
-                                    if replaceSuit == 'C':
-                                        newCard = oneAces[0]
-                                    elif replaceSuit == 'S':
-                                        newCard = oneAces[1]
-                                    elif replaceSuit == 'H':
-                                        newCard = oneAces[2]
-                                    elif replaceSuit == 'D':
-                                        newCard = oneAces[3]
-                                    hand.insert(0,newCard)
-                                    # Remove the last wrong ace card in the hand
-                                    hand = hand[:-1]
-                                    straightFlush.append(hand)
-                                else:
-                                    flush.append(hand)
-                            # Just the same as with the flushes... but instead called straights and highcards
-                            else:
-                                if numberOnly[1] == numberOnly[0] + 1 and numberOnly[2] == numberOnly[0] + 2 and numberOnly[3] == numberOnly[0] + 3 and numberOnly[4] == numberOnly[0] + 4:
-                                    straight.append(hand)
-                                elif numberOnly == [2, 3, 4, 5, 14]:
-                                    # Same process as for straight flush
-                                    replaceSuit = hand[-1].suit
-                                    if replaceSuit == 'C':
-                                        newCard = oneAces[0]
-                                    elif replaceSuit == 'S':
-                                        newCard = oneAces[1]
-                                    elif replaceSuit == 'H':
-                                        newCard = oneAces[2]
-                                    elif replaceSuit == 'D':
-                                        newCard = oneAces[3]
-                                    hand.insert(0,newCard)
-                                    hand = hand[:-1]
-                                    straight.append(hand)
-                                else:
-                                    highCard.append(hand)
+        #single pair
+        # These numbFreq are unique to a specific hand
+        if numbFreq == [1, 1, 1, 2]:
+            sortHand = sortedHand()
+            singlePair.append(sortHand)
+        #double pair
+        elif numbFreq == [1, 2, 2]:
+            sortHand = sortedHand()
+            doublePair.append(sortHand)
+
+        #three of a kind
+        elif numbFreq == [1, 1, 3]:
+            sortHand = sortedHand()
+            triple.append(sortHand)
+        #four of a kind
+        elif numbFreq == [1, 4]:
+            sortHand = sortedHand()
+            quadruple.append(sortHand)
+        #full house
+        elif numbFreq == [2, 3]:
+            sortHand = sortedHand()
+            fullHouse.append(sortHand)
+        #straight, flush, straight flush, and high card remaining
+        else:
+            # Define a set type containg only the suits
+            # As it is a set no repeats are counted
+            suitSet = set([card.suit for card in hand])
+
+            # sort numberOnly
+            numberOnly.sort()
+            hand.sort(key = lambda card: card.number)
+            # If the length of the set is only 1 then we know all cards have same suit and thus a sort of flush
+            if len(suitSet) == 1:
+                # This simply filters through hands which follow a sequence and therefore a straight.
+                if numberOnly[1] == numberOnly[0] + 1 and numberOnly[2] == numberOnly[0] + 2 and numberOnly[3] == numberOnly[0] + 3 and numberOnly[4] == numberOnly[0] + 4:
+                    straightFlush.append(hand)
+                # Straights can also be built with aces acting as 1 so here we make sure we don't forget about them!
+                elif numberOnly == [2, 3, 4, 5, 14]:
+                    # Add a card with the same suit as the ace but with a number = 1
+                    replaceSuit = hand[-1].suit
+                    if replaceSuit == 'C':
+                        newCard = oneAces[0]
+                    elif replaceSuit == 'S':
+                        newCard = oneAces[1]
+                    elif replaceSuit == 'H':
+                        newCard = oneAces[2]
+                    elif replaceSuit == 'D':
+                        newCard = oneAces[3]
+                    hand.insert(0,newCard)
+                    # Remove the last wrong ace card in the hand
+                    hand = hand[:-1]
+                    straightFlush.append(hand)
+                else:
+                    flush.append(hand)
+            # Just the same as with the flushes... but instead called straights and highcards
+            else:
+                if numberOnly[1] == numberOnly[0] + 1 and numberOnly[2] == numberOnly[0] + 2 and numberOnly[3] == numberOnly[0] + 3 and numberOnly[4] == numberOnly[0] + 4:
+                    straight.append(hand)
+                elif numberOnly == [2, 3, 4, 5, 14]:
+                    # Same process as for straight flush
+                    replaceSuit = hand[-1].suit
+                    if replaceSuit == 'C':
+                        newCard = oneAces[0]
+                    elif replaceSuit == 'S':
+                        newCard = oneAces[1]
+                    elif replaceSuit == 'H':
+                        newCard = oneAces[2]
+                    elif replaceSuit == 'D':
+                        newCard = oneAces[3]
+                    hand.insert(0,newCard)
+                    hand = hand[:-1]
+                    straight.append(hand)
+                else:
+                    highCard.append(hand)
 
 
 
@@ -210,23 +206,38 @@ def combination(deck,oneAces):
     hierarchy = [straightFlush, quadruple, fullHouse, flush, straight, triple, doublePair, singlePair, highCard]
     allHands = list(chain.from_iterable(hierarchy))
 
-
     return allHands
 
+def combination(deck,oneAces):
+    # deck is of numpy array type
+
+    # Loop through every combination of cards in the deck
+    iterHands = list(it.combinations(deck,5))
+    # Required since itertools uses tuples instead of lists and the code is already too messy
+    allUnsortedHands = [list(hand) for hand in iterHands]
+
+    allSortedHands = sortAllHands(allUnsortedHands,oneAces)
+
+    return allSortedHands
+
+t0 = time.time()
+sorted = combination(generateDeck(),generateOneAce())
+print([[card.comb for card in hand] for hand in sorted])
+print(time.time()-t0)
     # Edit 13/7/2021 Removed the save to csv function as it turns out to not be useful and instead this entire file will be loaded into the next part
     # Instead the flattened folder is returned
 
-    '''# Print just to make sure I filter the correct cards which I do!
-    for group in hierarchy:
-        print(len(group))
-    # Finally save the cards in a csv file
-    # Note: Excel/LibreOffice Calc is unable to open the 2+ million lines of hands :(
-    with open('pokerRankings.csv','w') as file:
-        writer = csv.writer(file)
-        for val in hierarchy:
-            for hand in val:
-                writer.writerow([str(val.number)+val.suit for val in hand])
-    '''
+    # # Print just to make sure I filter the correct cards which I do!
+    # for group in hierarchy:
+    #     print(len(group))
+    # # Finally save the cards in a csv file
+    # # Note: Excel/LibreOffice Calc is unable to open the 2+ million lines of hands :(
+    # with open('pokerRankings.csv','w') as file:
+    #     writer = csv.writer(file)
+    #     for val in hierarchy:
+    #         for hand in val:
+    #             writer.writerow([str(val.number)+val.suit for val in hand])
+    #
 # Call the function
 # combination()
 # Time the code.
