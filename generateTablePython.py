@@ -220,10 +220,6 @@ def combination(deck,oneAces):
 
     return allSortedHands
 
-t0 = time.time()
-sorted = combination(generateDeck(),generateOneAce())
-print([[card.comb for card in hand] for hand in sorted])
-print(time.time()-t0)
     # Edit 13/7/2021 Removed the save to csv function as it turns out to not be useful and instead this entire file will be loaded into the next part
     # Instead the flattened folder is returned
 
