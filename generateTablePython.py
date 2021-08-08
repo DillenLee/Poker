@@ -63,7 +63,7 @@ def outerHighCardSort(i):
 #-----------------------------
 
 
-def sortAllHands(unsortedHandsList,oneAces):
+def sortAllHands(unsortedHandsList):
 
     # loops through the unsorted list of hands and orders them strongest to weakest between all the hands, and weakest to strongest within the cards. I don't know why I did it like this in the beginning but it's too much effor to change right now.
 
@@ -78,9 +78,10 @@ def sortAllHands(unsortedHandsList,oneAces):
     straightFlush = []
     highCard = []
 
+    # Generate the list of one aces
+    oneAces = generateOneAce()
 
     for hand in unsortedHandsList:
-
         numberOnly = [card.number for card in hand]
 
         #numFreqDic produces a dictionary which tracks frequency of number
@@ -208,7 +209,7 @@ def sortAllHands(unsortedHandsList,oneAces):
 
     return allHands
 
-def combination(deck,oneAces):
+def combination(deck):
     # deck is of numpy array type
 
     # Loop through every combination of cards in the deck
@@ -216,7 +217,7 @@ def combination(deck,oneAces):
     # Required since itertools uses tuples instead of lists and the code is already too messy
     allUnsortedHands = [list(hand) for hand in iterHands]
 
-    allSortedHands = sortAllHands(allUnsortedHands,oneAces)
+    allSortedHands = sortAllHands(allUnsortedHands)
 
     return allSortedHands
 

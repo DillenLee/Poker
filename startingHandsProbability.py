@@ -26,10 +26,8 @@ t0 = time.time()
 
 # Generate the deck from the previous python file
 deck = gtp.generateDeck()
-# and the aces with number = 1
-oneAces = gtp.generateOneAce()
 # now generate all the possilbe hands
-allHands = gtp.combination(deck,oneAces)
+allHands = gtp.combination(deck)
 allNumbers = [[card.number for card in hand] for hand in allHands]
 
 tGenerate = time.time()
@@ -116,7 +114,7 @@ def calculateWLProb(hole):
 
 
 # Loop through all the possible combinations of the starting hands
-with open('startingHands.csv','w') as file:
+with open('data/startingHands.csv','w') as file:
     writer = csv.writer(file)
     for i in range(0,51):
         for j in range(i+1,52):
